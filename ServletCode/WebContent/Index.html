@@ -69,7 +69,7 @@
         $.ajax({
           type: "GET",
           url: "./ParseQuestion",
-          data:"question="+ q_text +"&type="+q_type+"&id="+q_id,
+          data:"question="+ q_text +"&subject="+sub_text,
           success: function(data) {
             $('#answer').text(data);
           }

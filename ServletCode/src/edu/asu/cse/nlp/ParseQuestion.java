@@ -1,4 +1,4 @@
-package nlp;
+package edu.asu.cse.nlp;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -28,10 +28,16 @@ public class ParseQuestion extends HttpServlet {
 		// TODO Auto-generated method stub
 		System.out.println("Here");
 		String question = request.getParameter("question");
-		String id = request.getParameter("id");
-		String type = request.getParameter("type");
+		String subject = request.getParameter("subject");
+		System.out.println("dasdasdadas " + subject);
+		System.out.println("ddsdadasdadas"+ question);
+//		String type = request.getParameter("type");
+		
+		POS_tagger tagger = new POS_tagger(subject,question);
+		String res = tagger.getResult();
+		System.out.println("exepcted" +res);
 		//process these inputs
-		response.getWriter().write("This is the Answer");
+		response.getWriter().write(res);
 	}
 
 	/**
