@@ -1,0 +1,80 @@
+<html>
+  <head>
+    <title>ui</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  </head>
+  <body>
+    Subject :
+    <select id="subject">
+      <option value="">Select a Subject</option>
+    </select>
+    <br>
+    <br>
+    Questions :
+    <select id="ques">
+        <option value="">Select a Question</option>
+    </select>
+    <button type="text" id="button"> Submit </button>
+    <br>
+    <br>
+    Answer :
+    <div id="answer"></div>
+
+    <script>
+      var xml = null;
+      $.ajax({
+        type: "GET",
+        url: "QA2004_testset.xml",
+        dataType: "xml",
+        success: function(data) {
+          xml = data;
+          $(xml).find('trecqa').find('target').each(function(){
+                var sub = $(this).attr('text');
+                var id = $(this).attr('id');
+                $('#subject').append("<option value="+ id +">" + sub + "</option>");
+          });
+        }
+      });
+
+      $('#subject').change(function(){
+        var id = $(this).val();
+        //console.log(id);
+        var subject = $(this).find("option:selected").text();
+        //console.log(subject);
+        //console.log($(xml).find("#" + id).find("q"));
+        var options = "<option value=''>Select a question</option>";
+        $(xml).find("#" + id).find("q").each(function(){
+          var q_id = $(this).attr('id');
+          var q_type = $(this).attr('type');
+          var q_text = $(this).text();
+          options += "<option data-type="+q_type+" value="+q_id+">" +q_text+ "</option>";
+        })
+        $('#ques').html(options);
+      });
+
+      $('#button').click(function(){
+        var sub_text=$('#subject').find("option:selected").text();
+        var q_id = $('#ques').val();
+        var q_type = $('#ques').find("option:selected").attr('data-type');
+        var q_text = $('#ques').find("option:selected").text();
+        console.log(q_id);
+        console.log(q_type);
+        console.log(q_text);
+        console.log(sub_text);
+        if (q_id==null || q_id=="" || q_id==undefined) {
+          alert("Please select a question");
+          return false;
+        }
+
+        $.ajax({
+          type: "GET",
+          url: "./ParseQuestion",
+          data:"question="+ q_text +"&subject="+sub_text,
+          success: function(data) {
+            $('#answer').text(data);
+          }
+        });
+      })
+    </script>
+  </body>
+</html>

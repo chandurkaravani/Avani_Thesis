@@ -19,6 +19,7 @@ import edu.stanford.nlp.trees.TreebankLanguagePack;
 import edu.stanford.nlp.trees.TypedDependency;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -36,10 +37,40 @@ public class POS_tagger {
 	private String subject;
 	private String question;
 	private String url;
+	private HashMap<String, String> URI_map = new HashMap<String, String>();
+	
 	
 	public POS_tagger(String subject, String question) {
 		this.subject = subject;
 		this.question = question;
+		
+		URI_map.put("Hale Bopp comet", "Comet_Hale-Bopp");
+		URI_map.put("Rhodes scholars", "Rhodes_Scholarship");
+		URI_map.put("agouti", "Common_agouti");
+		URI_map.put("Black Panthers", "Black_Panther_Party");
+		URI_map.put("prions", "Prion");
+		URI_map.put("the band Nirvana", "Nirvana_(band)");
+		URI_map.put("cataract", "Cataract");
+		URI_map.put("boxer Floyd Patterson", "Floyd_Patterson");
+		URI_map.put("architect Frank Gehry", "Frank_Gehry");
+		URI_map.put("Harlem Globe Trotters", "Harlem_Globetrotters");
+		URI_map.put("Abercrombie and Fitch", "Abercrombie_&_Fitch");
+		URI_map.put("Tale of Genji", "The_Tale_of_Genji");
+		URI_map.put("minstrel Al Jolson", "Al_Jolson");
+		URI_map.put("Wiggles", "The_Wiggles");
+		URI_map.put("Chester Nimitz", "Chester_W._Nimitz");
+		URI_map.put("Nobel prize", "Nobel_Prize");
+		URI_map.put("Bashar Assad", "Bashar_al-Assad");
+		URI_map.put("Cassini space probe", "Cassini–Huygens");
+		URI_map.put("Conde Nast", "Condé_Nast");
+		URI_map.put("Eileen Marie Collins", "Eileen_Collins");
+		URI_map.put("Liberty Bell 7", "Mercury-Redstone_4");
+		URI_map.put("International Finance Corporation (IFC)", "International_Finance_Corporation");
+		URI_map.put("philanthropist Alberto Vilar", "Alberto_Vilar");
+		URI_map.put("senator Jim Inhofe", "Jim_Inhofe");
+		URI_map.put("Berkman Center for Internet and Society", "Berkman_Center_for_Internet_&_Society");
+		URI_map.put("boll weevil", "Boll_weevil");
+		URI_map.put("space shuttles", "Space_Shuttle");
 	}
 	
 //	    public static void main(String args[]){
@@ -74,9 +105,20 @@ public class POS_tagger {
 	    	
 	    public void setSubjectPageURI()
 	    {
-    		subject = subject.replace(" ", "_");
+	    	
+	    	String URI;
+	    	
+	    	if(URI_map.containsKey(subject)){
+	    		
+	    		URI = URI_map.get(subject);
+	    	}
+	    	else{
+	    		
+	    		URI = subject.replace(" ", "_");
+	    	}
+	    	
     		url = "<http://dbpedia.org/resource/";
-    		url = url + subject + ">";
+    		url = url + URI + ">";
     		
     		
 	    }
