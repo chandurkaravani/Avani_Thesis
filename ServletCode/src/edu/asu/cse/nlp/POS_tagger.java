@@ -35,6 +35,7 @@ public class POS_tagger {
 	
 	private String subject;
 	private String question;
+	private String url;
 	
 	public POS_tagger(String subject, String question) {
 		this.subject = subject;
@@ -64,22 +65,32 @@ public class POS_tagger {
 	        LexicalizedParser lp = LexicalizedParser.loadModel(parserModel);
 
 
+    		
+    		setSubjectPageURI();
 	          
 
 	          return demoAPI(lp);
 	    }
 	    	
+	    public void setSubjectPageURI()
+	    {
+    		subject = subject.replace(" ", "_");
+    		url = "<http://dbpedia.org/resource/";
+    		url = url + subject + ">";
+    		
+    		
+	    }
 	    	
 	    
 	    
 
 	    
 	    public String demoAPI(LexicalizedParser lp) {
-	        String[] sent = { "This", "is", "an", "easy", "sentence", "." };
-	        List<CoreLabel> rawWords = Sentence.toCoreLabelList(sent);
-	        Tree parse = lp.apply(rawWords);
-	        parse.pennPrint();
-	        System.out.println();
+//	        //String[] sent = { "This", "is", "an", "easy", "sentence", "." };
+//	        List<CoreLabel> rawWords = Sentence.toCoreLabelList(sent);
+//	        Tree parse = lp.apply(rawWords);
+//	        parse.pennPrint();
+//	        System.out.println();
 	        
 	        //String sent2 = "When did James Dean die ?";
 	        TokenizerFactory<CoreLabel> tokenizerFactory =
@@ -87,7 +98,7 @@ public class POS_tagger {
 	        Tokenizer<CoreLabel> tok =
 	            tokenizerFactory.getTokenizer(new StringReader(question));
 	        List<CoreLabel> rawWords2 = tok.tokenize();
-	        parse = lp.apply(rawWords2);
+	        Tree parse = lp.apply(rawWords2);
 
 	        TreebankLanguagePack tlp = lp.treebankLanguagePack(); // PennTreebankLanguagePack for English
 	        GrammaticalStructureFactory gsf = tlp.grammaticalStructureFactory();
@@ -148,9 +159,7 @@ public class POS_tagger {
 	    public String when_questions(List<Tree> verbList){
 	    	
 	    	//String subject = "James Dean";
-    		subject = subject.replace(" ", "_");
-    		String url = "<http://dbpedia.org/resource/";
-    		url = url + subject + ">";
+
     		String sparql_query="";
 	    	
 	    	if(verbList.get(0).toString().equals("born")){
