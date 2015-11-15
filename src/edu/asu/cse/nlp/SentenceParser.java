@@ -16,13 +16,40 @@ public class SentenceParser {
 	
 	private static final String parserModel = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz";
     LexicalizedParser lp;
-    List<Tree> verbList=new ArrayList<Tree>();
-    List<Tree> nounList=new ArrayList<Tree>();
+    List<Tree> verbList = new ArrayList<Tree>();
+    List<Tree> nounList = new ArrayList<Tree>();
     List<Tree> whList = new ArrayList<Tree>();
     List<Tree> nounPhrase = new ArrayList<Tree>();
-    
+    List<Tree> vbnList = new ArrayList<Tree>();
+    List<Tree> npList = new ArrayList<Tree>();
+    List<Tree> adjList = new ArrayList<Tree>();
+    List<Tree> nnList = new ArrayList<Tree>();
+    List<Tree> nnsList = new ArrayList<Tree>();
 
-    public List<Tree> getVerbList() {
+    
+    
+    
+    public List<Tree> getAdjList() {
+		return adjList;
+	}
+
+	public List<Tree> getNnList() {
+		return nnList;
+	}
+
+	public List<Tree> getNnsList() {
+		return nnsList;
+	}
+
+	public List<Tree> getNpList() {
+		return npList;
+	}
+
+	public List<Tree> getVbnList() {
+		return vbnList;
+	}
+
+	public List<Tree> getVerbList() {
 		return verbList;
 	}
 
@@ -60,11 +87,17 @@ public class SentenceParser {
 
         for (Tree subtree: tree){
             
-          if(subtree.label().value().equals("VB") || subtree.label().value().equals("VBN")){
-            verbList.add(subtree.lastChild());
+          if(subtree.label().value().equals("VBN")){
+            vbnList.add(subtree.lastChild());
+          }
+          if(subtree.label().value().equals("VB")){
+        	  verbList.add(subtree.lastChild());
           }
           if(subtree.label().value().equals("NNP") || subtree.label().value().equals("NN")){
               nounList.add(subtree.lastChild());
+          }
+          if(subtree.label().value().equals("NN")){
+              nnList.add(subtree.lastChild());
           }
           
           if(subtree.label().value().equals("WRB")){
@@ -72,7 +105,13 @@ public class SentenceParser {
           }
           
           if(subtree.label().value().equals("NP")){
-              whList.add(subtree.lastChild());
+              npList.add(subtree.lastChild());
+          }
+          if(subtree.label().value().equals("JJ")){
+              adjList.add(subtree.lastChild());
+          }
+          if(subtree.label().value().equals("NNS")){
+              nnsList.add(subtree.lastChild());
           }
           
         }
@@ -81,5 +120,7 @@ public class SentenceParser {
           System.out.println(whList);
           System.out.println(nounPhrase);
     }
+    
+    
    
 }

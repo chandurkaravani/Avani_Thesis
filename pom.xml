@@ -47,14 +47,36 @@
 			<artifactId>unirest-java</artifactId>
 			<version>1.4.7</version>
 		</dependency>
-		  <dependency>
+		
+		<dependency>
     		<groupId>org.apache.jena</groupId>
-    <artifactId>apache-jena-libs</artifactId>
-    <type>pom</type>
-    <version>3.0.0</version>
-  </dependency>
-
+    		<artifactId>apache-jena-libs</artifactId>
+			<type>pom</type>
+			<version>3.0.0</version>
+  		</dependency>
+  
+  		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.0</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.python</groupId>
+			<artifactId>jython-standalone</artifactId>
+			<version>2.7-b1</version>
+		</dependency>
+		
+		<dependency>
+    		<groupId>com.wordsapi.www</groupId>
+    		<artifactId>words-api</artifactId>
+    		<version>0.0.5</version>
+    		<scope>compile</scope>
+		</dependency>
+		
+	
 	</dependencies>
+	
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>

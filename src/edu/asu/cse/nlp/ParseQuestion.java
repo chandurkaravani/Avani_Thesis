@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class ParseQuestion
  */
+
 @WebServlet("/ParseQuestion")
 public class ParseQuestion extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -26,12 +27,15 @@ public class ParseQuestion extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		System.out.println("Here");
+		
+		//System.out.println("Here");
+		
 		String question = request.getParameter("question");
 		String subject = request.getParameter("subject");
-		System.out.println("dasdasdadas " + subject);
-		System.out.println("ddsdadasdadas"+ question);
-//		String type = request.getParameter("type");
+		
+		//System.out.println("dasdasdadas " + subject);
+		//System.out.println("ddsdadasdadas"+ question);
+		//String type = request.getParameter("type");
 		
 		POS_tagger tagger = new POS_tagger(subject,question);
 		String res = tagger.getResult();

@@ -12,12 +12,18 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 
 import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.util.StringUtils;
 
 public class POS_tagger {
 	
 	private String subject;
 	private String question;
 	private String url;
+	
+	
+	SentenceParser parser;
+	
+	
 	private static HashMap<String, String> URI_map = new HashMap<String, String>();
 	
 	static
@@ -55,9 +61,8 @@ public class POS_tagger {
 	public POS_tagger(String subject, String question) {
 		this.subject = subject;
 		this.question = question;
-		
-
 	}
+
 	
 //	    public static void main(String args[]){
 //	        String parserModel = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz";
@@ -74,13 +79,25 @@ public class POS_tagger {
 //	        }
 //	    }
 	    
-	    public String getResult()
+	    public SentenceParser getParser() {
+		return parser;
+	}
+
+		public String getResult()
 	    {
     		setSubjectPageURI();
-    		SentenceParser parser = new SentenceParser();
+    		parser = new SentenceParser();
     		parser.setProcessedTree(question);
-    		
-	        return getResultForQuestion(parser);
+    		String queryResult = "";
+    		try
+    		{
+    			queryResult = getResultForQuestion();
+    		}
+    		catch(Exception ex)
+    		{
+    			queryResult="Cannot find answer";
+    		}
+	        return queryResult;
 	    }
 	    	
 	    public void setSubjectPageURI()
@@ -99,11 +116,9 @@ public class POS_tagger {
 	    	
     		url = "<http://dbpedia.org/resource/";
     		url = url + URI + ">";
-    		
-    		
 	    }
 	    
-	    public String getResultForQuestion(SentenceParser parser){
+	    public String getResultForQuestion(){
 	    	
 	    	String whQuestion = parser.getWhList().get(0).toString();
 	    	
@@ -113,20 +128,23 @@ public class POS_tagger {
 	    		
 	    		System.out.println("Inside When");
 	    		
-	    		result = getWhenResults(parser.getVerbList());
+	    		result = getWhenResults();
 	    		
 	    	}
 	    	return result;
 	    }
 	    
-	    public String getWhenResults(List<Tree> verbList){
+	    	
+	    public String getWhenResults(){
 	    	
 	    	//String subject = "James Dean";
 
     		String sparql_query="";
     		String result;
 	    	
-	    	if(verbList.get(0).toString().equals("born")){
+	   if(getParser().getVbnList().size()>0 && getParser().getVbnList().get(0).toString().equals("born")){
+		   
+		   		//System.out.println("here i am.");
 	    		
 	    		String query = "SELECT ?variable WHERE {";
 	    		String query2 = " dbp:dateOfBirth ?variable }";
@@ -135,10 +153,9 @@ public class POS_tagger {
 	    		System.out.println(sparql_query);
 	    		return getSpaqrlQueryResponse(sparql_query);
 	    		
-	    		
 	    	}
 	    	
-	    	if(verbList.get(0).toString().equals("die")){
+	    	else if(getParser().getVerbList().size()>0 && getParser().getVerbList().get(0).toString().equals("die")){
 	    		
 	    		String query = "SELECT ?variable WHERE {";
 	    		String query2 = " dbp:dateOfDeath ?variable}";
@@ -149,10 +166,13 @@ public class POS_tagger {
 	    	}
 	    	else
 	    	{
-	    		
-	    		return getResultFromAbstract();
+	    		String ans = getResultFromAbstract();
+	    		if(ans.endsWith(",")){
+	    			ans = ans.substring(0, ans.length()-1);
+	    		}
+	    		return ans;
 	    	}
-	    	
+	   		
 	    	return getSpaqrlQueryResponse(sparql_query);
 	    }
 	    
@@ -162,7 +182,9 @@ public class POS_tagger {
 	    	        "PREFIX dbp: <http://dbpedia.org/property/>" +
 	    	        "PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> " 
 	    	        +"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"+ sparql_query;
-	    	System.out.println(stringQuery);
+	    	
+	    	// System.out.println(stringQuery);
+	    	
 	    	Query query = QueryFactory.create(stringQuery);
 	    	QueryExecution qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", query);
 
@@ -172,6 +194,7 @@ public class POS_tagger {
 	    	qexec.close() ;
 	    	return l.getString();
 	    }
+	    
 	    public String getResultFromAbstract(){
 	    	StringBuilder finalQuery = new StringBuilder();
 	    	String query1 = "SELECT ?variable WHERE {";
@@ -185,15 +208,145 @@ public class POS_tagger {
 	    	String[] abstractLines = abs.split("\\.\\s");
 	    	
 	    	SentenceParser parser = new SentenceParser();
+	    	String date = null;
+	    	
+	    	boolean found = false;
 	    	for(String s : abstractLines){
 	    		parser.setProcessedTree(s);
-	    		System.out.println(parser.getNounPhrase());
-	    		//System.out.println(question + "\n");
+	    		if(!parser.getVbnList().isEmpty()){
+	    		found = checkVerb(parser);
+	    		if(found){
+	    			//verbFound = true;
+	    			date = getDate(s);
+	    			if(date != null)
+	    				return date;
+	    			//System.out.println(date);
+	    			}	
+	    		}
+	    	}
+	    	
+	    	for(String s : abstractLines){
+	    		parser = new SentenceParser();
+	    		parser.setProcessedTree(s);
+	    		if(!parser.getAdjList().isEmpty()){
+	    		found = checkAdjective(parser);
+	    		if(found){
+	    			date = getDate(s);
+	    			if(date != null)
+	    				return date;
+	    			}
+	    		}
+	    	}
+	    	
+	    	for(String s : abstractLines){
+	    		parser = new SentenceParser();
+
+	    		parser.setProcessedTree(s);
+	    		if(!parser.getNnList().isEmpty()){
+	    		found = checkNoun(parser);
+	    		if(found){
+	    			date = getDate(s);
+	    			if(date != null)
+	    				return date;
+	    			}
+	    		}
+	    	}
+	    	
+	    	if(date == null) {
+	    		for(String s : abstractLines){
+		    			date = getDate(s);
+		    			if(date != null)
+		    				return date;
+		    			}
 	    	}
 	    	return "";
 	    }
 	    
+	    public String getDate(String line){
+	    	String[] words = line.split(" ");
+	    	System.out.println("line"+  line);
+	    	System.out.println("words is "+ words.length);
+	    	
+	    	for(String str : words){
+	    		System.out.println("string is :"+ str);
+	    		if(str.length() > 2 && StringUtils.isNumeric(str.substring(0, 1))){
+	    			return str;
+	    		}
+	    	}return null;
+	    }
 	    
+	    public boolean checkVerb(SentenceParser parser){
+	    	List<Tree> vbnQues = getParser().getVbnList();
+	    	List<Tree> vbnAbstract = parser.getVbnList();
+	    	//List<Tree> nnsAbstract = parser.getNnsList();
+	    	
+	    	boolean wordFound = false;
+	    	Tree t = null;
+	    	
+	    	if (!vbnQues.isEmpty()){
+	    	t=vbnQues.get(0);
+	    	
+	    	for(int i=0; i< vbnAbstract.size();i++)
+	    	{
+	    		if(vbnAbstract.get(i)!=null && t.toString().equals(vbnAbstract.get(i).toString()))
+	    		{	
+	    			wordFound = true;
+	    			break;
+	    			//List<Tree> npList = parser.getNpList();
+	    			//System.out.println(npList);
+	    		}
+	    	}	    	
+    			//System.out.println("wordFound is : " + wordFound);
+    			return wordFound;
+    			}return false;
+	    }
+
+	    
+	    public boolean checkAdjective(SentenceParser parser){
+	    	
+	    	boolean wordFound = false;
+	    	List<Tree> adjAbstract = parser.getAdjList();
+	    	Tree t = null;
+	    	
+	    	if (!getParser().getAdjList().isEmpty()){
+	    		t=getParser().getAdjList().get(0);
+	    	
+	    		for(int i=0; i<adjAbstract.size(); i++){
+	    			if(adjAbstract.get(i)!=null && t.toString().equals(adjAbstract.get(i).toString()))
+			    		{
+			    			wordFound = true;
+			    			break;
+			    			//List<Tree> npList = parser.getNpList();
+			    			//System.out.println(npList);
+			    		}
+	    		}
+	    		
+	    		return wordFound;
+	    		}return false;
+	    	}
+	    
+	    
+	    public boolean checkNoun(SentenceParser parser){
+	    	
+	    	boolean wordFound = false;
+	    	Tree t = null;
+	    	List<Tree> nnAbstract = parser.getNnList();
+	    	
+	    	if(!getParser().getNnList().isEmpty()){
+	    		t = getParser().getNnList().get(0);
+	    	
+	    		for(int i=0; i<nnAbstract.size(); i++){
+	    			if(nnAbstract.get(i)!=null && t.toString().equals(nnAbstract.get(i).toString()))
+			    		{	
+			    			wordFound = true;
+			    			break;
+			    			
+			    			//List<Tree> npList = parser.getNpList();
+			    			//System.out.println(npList);
+			    		}
+	    		}
+			return wordFound;
+		}return false;
 	}
-
-
+	    
+}

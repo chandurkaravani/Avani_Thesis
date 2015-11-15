@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.HashSet;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,6 +16,12 @@ import org.json.JSONObject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.GetRequest;
+
+import com.wordsapi.www.client.*;
+import com.wordsapi.www.wordsapi.api.*;
+import com.wordsapi.www.wordsapi.model.*;
 
 
 public class read_from_json_url {
@@ -44,33 +51,40 @@ public class read_from_json_url {
 	
 	public static void main(String[] args) throws IOException, JSONException {
 	    JSONObject json = readJsonFromUrl("http://dbpedia.org/data/James_Dean.json");
-	    //System.out.println(json.toString());
 	    json = (JSONObject) json.get("http://dbpedia.org/resource/James_Dean");
 	    System.out.println(json);
 	    JSONArray arr = (JSONArray) json.get("http://dbpedia.org/property/almaMater");
-	    //System.out.println(arr);
+	    
 	    String name = (String) ((JSONObject) arr.get(0)).get("value");
-	    //System.out.println(json.get("http://dbpedia.org/property/almaMater"));
-	    //System.out.println(name);
+	     
+	    String [] jsonArray = (JSONObject.getNames(json));
+
+	    HashSet<String> tags = new HashSet<String>();
+
+	    for(String s : jsonArray){
+	    	System.out.println(s);
+	    	tags.add(s);
+	    }
 	    
 	    try{
-		    HttpResponse<JsonNode> response = Unirest.post("https://twinword-lemmatizer1.p.mashape.com/extract/")
-		    		.header("X-Mashape-Key", "r2iAzEK2ilmshMy6isqkHL9j8UiJp1XMo3ojsn1IMggY2xD7DK")
-		    		.header("Content-Type", "application/x-www-form-urlencoded")
-		    		.header("Accept", "application/json")
-		    		.field("text", "When was the comet founded ?")
-		    		.asJson();
+//		    HttpResponse<JsonNode> response = Unirest.post("https://twinword-lemmatizer1.p.mashape.com/extract/")
+//		    		.header("X-Mashape-Key", "r2iAzEK2ilmshMy6isqkHL9j8UiJp1XMo3ojsn1IMggY2xD7DK")
+//		    		.header("Content-Type", "application/x-www-form-urlencoded")
+//		    		.header("Accept", "application/json")
+//		    		.field("text", "When was the comet founded ?")
+//		    		.asJson();
 		    //System.out.println(response.getBody());
+		    
+	    	HttpResponse<JsonNode> response = Unirest.get("https://wordsapiv1.p.mashape.com/words/die").header("X-Mashape-Key", "jbww4coyOHmshYmdYYBixq9DtwsYp1PgetcjsnmKRdjNTLbMQ8")
+		    		.header("Content-Type", "application/x-www-form-urlencoded")
+		    		.header("Accept", "application/json").asJson();
+			System.out.println(response.getBody());
+
 		    }
 		    
 		    catch(Exception e){
 		    	
 		    	e.printStackTrace();
 		    }
-	    
-	    
-	    
-	    
 	  }
-
 }
