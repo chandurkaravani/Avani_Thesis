@@ -17,10 +17,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Program Files/stanford-classifier-2015-04-20/stanford-classifier.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/stanford-classifier-2015-04-20/stanford-classifier-3.5.2.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/stanford-classifier-2015-04-20/stanford-classifier-3.5.2-javadoc.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/stanford-classifier-2015-04-20/stanford-classifier-3.5.2-sources.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/jaunt1.1.1/jaunt1.1.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
